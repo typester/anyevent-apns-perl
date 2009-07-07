@@ -51,6 +51,12 @@ has on_error => (
     default => sub { sub { warn @_ } },
 );
 
+has on_connect => (
+    is      => 'rw',
+    isa     => 'CodeRef',
+    default => sub { sub {} },
+);
+
 no Any::Moose;
 
 sub BUILD {
@@ -84,7 +90,7 @@ sub _error_handler {
 sub _connect {
     my $self = shift;
 
-    undef $self->handler;
+    undef $self->{handler};
 
     my $host = $self->sandbox
         ? 'gateway.sandbox.push.apple.com'
@@ -104,6 +110,8 @@ sub _connect {
             },
         );
         $self->handler( $handle );
+
+        $self->on_connect->();
     };
 }
 
@@ -113,7 +121,7 @@ __END__
 
 =head1 NAME
 
-AnyEvent::APNS - Module abstract (<= 44 characters) goes here
+AnyEvent::APNS - AnyEvent class for Apple Push Notifications Service (APNS) provider
 
 =head1 SYNOPSIS
 
@@ -121,17 +129,19 @@ AnyEvent::APNS - Module abstract (<= 44 characters) goes here
     
     my $cv = AnyEvent->condvar;
     
-    my $apns = AnyEvent::APNS->new(
+    my $apns; $apns = AnyEvent::APNS->new(
         certificate => 'your apns certificate file',
         private_key => 'your apsn private key file',
         sandbox     => 1,
-    );
-    
-    $apns->send( $device_token => {
-        aps => {
-            alert => 'Message received from Bob',
+        on_error    => sub { # something went wrong },
+        on_connect  => sub {
+            $apns->send( $device_token => {
+                aps => {
+                    alert => 'Message received from Bob',
+                },
+            });
         },
-    });
+    );
     
     # disconnect and exit program as soon as possible after sending a message
     # otherwise $apns makes persistent connection with apns server
@@ -144,11 +154,83 @@ AnyEvent::APNS - Module abstract (<= 44 characters) goes here
 
 =head1 DESCRIPTION
 
-Stub documentation for this module was created by ExtUtils::ModuleMaker.
-It looks like the author of the extension was negligent enough
-to leave the stub unedited.
+This module helps you to create Apple Push Notifications Service (APNS) Provider.
 
-Blah blah blah.
+=head1 METHOD
+
+=head2 new
+
+Create APNS object and connect to apns service.
+
+    my $apns = AnyEvent::APNS->new(
+        certificate => 'your apns certificate file',
+        private_key => 'your apsn private key file',
+        sandbox     => 1,
+        on_error    => sub { # something went wrong },
+    );
+
+Supported arguments are:
+
+=over 4
+
+=item certificate => 'your apns certificate file'
+
+Required
+
+=item private_key => 'your apsn private key file',
+
+Required
+
+=item sandbox => 0|1
+
+This is a flag indicate target service is provisioning (sandbox => 1) or distribution (sandbox => 0)
+
+Optional (Default: 0)
+
+=item on_error => $cb->($handle, $fatal, $message)
+
+Callback to be called when something error occurs.
+This is wrapper for L<AnyEvent::Handle>'s on_error callbacks. Look at the document for more detail.
+
+Optional (Default: just warn error)
+
+=item on_connect => $cb->()
+
+Callback to be called when connection established to apns server.
+
+Optional (Default: empty coderef)
+
+=back
+
+=head2 $apns->send( $device_token, \%payload )
+
+Send apns messages with C<\%payload> to device speficied C<$device_token>.
+
+    $apns->send( $device_token => {
+        aps => {
+            alert => 'Message received from Bob',
+        },
+    });
+
+C<$device_token> shuould be a binary 32bytes device token provided by iPhone SDK (3.0 or above)
+
+C<\%payload> should be a hashref suitable to apple document: L<http://developer.apple.com/iPhone/library/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/ApplePushService/ApplePushService.html>
+
+Note: If you involve multi-byte strings in C<\%payload>, it should be utf8 decoded strings not utf8 bytes.
+
+=head1 TODO
+
+=over 4
+
+=item *
+
+More correct error handling
+
+=item *
+
+Auto recconection
+
+=back
 
 =head1 AUTHOR
 
