@@ -1,3 +1,5 @@
+BEGIN { $ENV{PERL_DL_NONLAZY} = 0; } # XXX
+
 use Test::Base;
 use Test::TCP;
 
