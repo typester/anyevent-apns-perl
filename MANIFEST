@@ -1,5 +1,6 @@
 Changes
 inc/Module/Install.pm
+inc/Module/Install/AuthorTests.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
 inc/Module/Install/Fetch.pm
@@ -15,6 +16,7 @@ inc/Test/Base/Filter.pm
 inc/Test/Builder.pm
 inc/Test/Builder/Module.pm
 inc/Test/More.pm
+inc/Test/TCP.pm
 lib/AnyEvent/APNS.pm
 LICENSE
 Makefile.PL
@@ -22,5 +24,7 @@ MANIFEST			This list of files
 META.yml
 README
 t/00_compile.t
+t/01_simple.t
 t/pod.t
 t/pod_coverage.t
+xt/live.t

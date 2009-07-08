@@ -121,7 +121,7 @@ __END__
 
 =head1 NAME
 
-AnyEvent::APNS - AnyEvent class for Apple Push Notifications Service (APNS) provider
+AnyEvent::APNS - Simple wrapper for Apple Push Notifications Service (APNS) provider
 
 =head1 SYNOPSIS
 
