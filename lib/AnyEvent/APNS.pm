@@ -11,7 +11,7 @@ require bytes;
 use Encode;
 use JSON::Any;
 
-our $VERSION = '0.01';
+our $VERSION = '0.01001';
 
 has certificate => (
     is       => 'rw',
@@ -131,7 +131,7 @@ AnyEvent::APNS - Simple wrapper for Apple Push Notifications Service (APNS) prov
     
     my $apns; $apns = AnyEvent::APNS->new(
         certificate => 'your apns certificate file',
-        private_key => 'your apsn private key file',
+        private_key => 'your apns private key file',
         sandbox     => 1,
         on_error    => sub { # something went wrong },
         on_connect  => sub {
@@ -156,7 +156,7 @@ AnyEvent::APNS - Simple wrapper for Apple Push Notifications Service (APNS) prov
 
 This module helps you to create Apple Push Notifications Service (APNS) Provider.
 
-=head1 METHOD
+=head1 METHODS
 
 =head2 new
 
@@ -164,7 +164,7 @@ Create APNS object and connect to apns service.
 
     my $apns = AnyEvent::APNS->new(
         certificate => 'your apns certificate file',
-        private_key => 'your apsn private key file',
+        private_key => 'your apns private key file',
         sandbox     => 1,
         on_error    => sub { # something went wrong },
     );
@@ -177,7 +177,7 @@ Supported arguments are:
 
 Required
 
-=item private_key => 'your apsn private key file',
+=item private_key => 'your apns private key file',
 
 Required
 
@@ -217,6 +217,10 @@ C<$device_token> shuould be a binary 32bytes device token provided by iPhone SDK
 C<\%payload> should be a hashref suitable to apple document: L<http://developer.apple.com/iPhone/library/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/ApplePushService/ApplePushService.html>
 
 Note: If you involve multi-byte strings in C<\%payload>, it should be utf8 decoded strings not utf8 bytes.
+
+=head2 $apns->handler
+
+Return L<AnyEvent::Handle> object which is used to current established connection. It returns undef before connection completed.
 
 =head1 TODO
 
