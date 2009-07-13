@@ -5,6 +5,7 @@ all_from 'lib/AnyEvent/APNS.pm';
 requires 'Any::Moose';
 requires 'AnyEvent'    => '4.80';
 requires 'Net::SSLeay' => '1.33';
+requires 'JSON::Any';
 
 test_requires 'Test::More';
 test_requires 'Test::TCP';
