@@ -5,7 +5,6 @@ use Test::TCP;
 
 plan tests => 5;
 
-use AnyEvent::Impl::Perl;
 use AnyEvent::APNS;
 use AnyEvent::Socket;
 
