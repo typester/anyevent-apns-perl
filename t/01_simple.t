@@ -5,6 +5,7 @@ use Test::TCP;
 
 plan tests => 5;
 
+use AnyEvent::Impl::Perl;
 use AnyEvent::APNS;
 use AnyEvent::Socket;
 
@@ -49,10 +50,13 @@ tcp_server undef, $port, sub {
 
 # client XXX: a bit hacky
 no warnings 'redefine';
-*AnyEvent::APNS::_connect = sub {
+*AnyEvent::APNS::connect = sub {
     my $self = shift;
 
-    undef $self->{handler};
+    if ($self->handler) {
+        warn 'Already connected!';
+        return;
+    }
 
     tcp_connect '127.0.0.1', $port, sub {
         my ($fh) = @_
@@ -75,5 +79,6 @@ my $apns; $apns = AnyEvent::APNS->new(
         $apns->send('d' x 32 => { foo => 'bar' });
     },
 );
+$apns->connect;
 
 $cv->recv;

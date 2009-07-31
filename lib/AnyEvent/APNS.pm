@@ -59,11 +59,6 @@ has on_connect => (
 
 no Any::Moose;
 
-sub BUILD {
-    my ($self) = @_;
-    $self->_connect;
-}
-
 sub send {
     my $self = shift;
     my ($token, $payload) = @_;
@@ -87,10 +82,13 @@ sub _error_handler {
     $self->on_error(@_);
 }
 
-sub _connect {
+sub connect {
     my $self = shift;
 
-    undef $self->{handler};
+    if ($self->handler) {
+        warn 'Already connected!';
+        return;
+    }
 
     my $host = $self->sandbox
         ? 'gateway.sandbox.push.apple.com'
