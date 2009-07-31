@@ -140,6 +140,7 @@ AnyEvent::APNS - Simple wrapper for Apple Push Notifications Service (APNS) prov
             });
         },
     );
+    $apns->connect;
     
     # disconnect and exit program as soon as possible after sending a message
     # otherwise $apns makes persistent connection with apns server
@@ -154,11 +155,16 @@ AnyEvent::APNS - Simple wrapper for Apple Push Notifications Service (APNS) prov
 
 This module helps you to create Apple Push Notifications Service (APNS) Provider.
 
+=head1 NOTE FOR 0.01x USERS
+
+From 0.02, this module does not connect in constructor.
+You should call connect method explicily to connect server.
+
 =head1 METHODS
 
 =head2 new
 
-Create APNS object and connect to apns service.
+Create APNS object.
 
     my $apns = AnyEvent::APNS->new(
         certificate => 'your apns certificate file',
@@ -199,6 +205,10 @@ Callback to be called when connection established to apns server.
 Optional (Default: empty coderef)
 
 =back
+
+=head2 $apns->connect;
+
+Connect to apns server.
 
 =head2 $apns->send( $device_token, \%payload )
 
