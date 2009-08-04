@@ -25,6 +25,6 @@ META.yml
 README
 t/00_compile.t
 t/01_simple.t
-t/pod.t
-t/pod_coverage.t
 xt/live.t
+xt/pod.t
+xt/pod_coverage.t
