@@ -63,6 +63,11 @@ has debug_port => (
     predicate => 'is_debug',
 );
 
+has _con_guard => (
+    is  => 'rw',
+    isa => 'Object',
+);
+
 no Any::Moose;
 
 sub send {
@@ -106,7 +111,7 @@ sub connect {
         $port = $self->debug_port;
     }
 
-    tcp_connect $host, $port, sub {
+    my $g = tcp_connect $host, $port, sub {
         my ($fh) = @_
             or return $self->on_error($!);
 
@@ -128,6 +133,10 @@ sub connect {
 
         $self->on_connect->();
     };
+    Scalar::Util::weaken($self);
+    $self->_con_guard($g);
+
+    $self;
 }
 
 __PACKAGE__->meta->make_immutable;
