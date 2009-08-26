@@ -21,7 +21,7 @@ my $apns; $apns = AnyEvent::APNS->new(
         $apns->send($token => { aps => { alert => "テスト！" }});
         $apns->handler->on_drain(sub { undef $_[0]; $cv->send });
     },
-);
+)->connect;
 
 $cv->recv;
 
