@@ -57,6 +57,12 @@ has on_connect => (
     default => sub { sub {} },
 );
 
+has debug_port => (
+    is        => 'rw',
+    isa       => 'Int',
+    predicate => 'is_debug',
+);
+
 no Any::Moose;
 
 sub send {
@@ -93,19 +99,30 @@ sub connect {
     my $host = $self->sandbox
         ? 'gateway.sandbox.push.apple.com'
         : 'gateway.push.apple.com';
+    my $port = 2195;
 
-    tcp_connect $host, 2195, sub {
+    if ($self->is_debug) {
+        $host = '127.0.0.1';
+        $port = $self->debug_port;
+    }
+
+    tcp_connect $host, $port, sub {
         my ($fh) = @_
             or return $self->on_error($!);
 
         my $handle = AnyEvent::Handle->new(
             fh       => $fh,
-            on_error => sub { $self->_error_handler(@_) },
-            tls      => 'connect',
-            tls_ctx  => {
-                cert_file => $self->certificate,
-                key_file  => $self->private_key,
+            on_error => sub {
+                $self->_error_handler(@_);
+                $_[0]->destroy;
             },
+            !$self->is_debug ? (
+                tls      => 'connect',
+                tls_ctx  => {
+                    cert_file => $self->certificate,
+                    key_file  => $self->private_key,
+                },
+            ) : (),
         );
         $self->handler( $handle );
 
