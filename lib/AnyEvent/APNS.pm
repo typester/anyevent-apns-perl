@@ -11,7 +11,7 @@ require bytes;
 use Encode;
 use JSON::Any;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 has certificate => (
     is       => 'rw',
@@ -86,13 +86,6 @@ sub send {
     $h->push_write( $json );                           # payload
 }
 
-sub _error_handler {
-    my $self = shift;
-    my ($handle, $fatal, $message) = @_;
-
-    $self->on_error(@_);
-}
-
 sub connect {
     my $self = shift;
 
@@ -113,12 +106,12 @@ sub connect {
 
     my $g = tcp_connect $host, $port, sub {
         my ($fh) = @_
-            or return $self->on_error($!);
+            or return $self->on_error->(undef, 1, $!);
 
         my $handle = AnyEvent::Handle->new(
             fh       => $fh,
             on_error => sub {
-                $self->_error_handler(@_);
+                $self->on_error->(@_);
                 $_[0]->destroy;
             },
             !$self->is_debug ? (
@@ -133,6 +126,7 @@ sub connect {
 
         $self->on_connect->();
     };
+
     Scalar::Util::weaken($self);
     $self->_con_guard($g);
 

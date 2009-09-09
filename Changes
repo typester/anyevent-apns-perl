@@ -1,5 +1,8 @@
 Revision history for Perl extension AnyEvent::APNS
 
+0.04  2009-09-09T12:00:10+09:00
+      - fixed a bug around error_handler
+
 0.03  2009-08-26T12:34:45+09:00
       - fixed a bug that object doesn't cleanup correctly
 
