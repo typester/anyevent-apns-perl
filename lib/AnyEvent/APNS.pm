@@ -32,8 +32,10 @@ has sandbox => (
 );
 
 has handler => (
-    is  => 'rw',
-    isa => 'AnyEvent::Handle',
+    is      => 'rw',
+    isa     => 'AnyEvent::Handle',
+    predicate => 'connected',
+    clearer   => 'clear_handler',
 );
 
 has json_driver => (
@@ -89,7 +91,7 @@ sub send {
 sub connect {
     my $self = shift;
 
-    if ($self->handler) {
+    if ($self->connected) {
         warn 'Already connected!';
         return;
     }
@@ -112,6 +114,7 @@ sub connect {
             fh       => $fh,
             on_error => sub {
                 $self->on_error->(@_);
+                $self->clear_handler;
                 $_[0]->destroy;
             },
             !$self->is_debug ? (
