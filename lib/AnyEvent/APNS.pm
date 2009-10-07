@@ -174,6 +174,9 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=for stopwords
+apns SDK TODO iPhone multi-byte utf8
+
 =head1 NAME
 
 AnyEvent::APNS - Simple wrapper for Apple Push Notifications Service (APNS) provider
@@ -215,7 +218,7 @@ This module helps you to create Apple Push Notifications Service (APNS) Provider
 =head1 NOTE FOR 0.01x USERS
 
 From 0.02, this module does not connect in constructor.
-You should call connect method explicily to connect server.
+You should call connect method explicitly to connect server.
 
 =head1 METHODS
 
@@ -269,7 +272,7 @@ Connect to apns server.
 
 =head2 $apns->send( $device_token, \%payload )
 
-Send apns messages with C<\%payload> to device speficied C<$device_token>.
+Send apns messages with C<\%payload> to device specified C<$device_token>.
 
     $apns->send( $device_token => {
         aps => {
@@ -277,7 +280,7 @@ Send apns messages with C<\%payload> to device speficied C<$device_token>.
         },
     });
 
-C<$device_token> shuould be a binary 32bytes device token provided by iPhone SDK (3.0 or above)
+C<$device_token> should be a binary 32bytes device token provided by iPhone SDK (3.0 or above)
 
 C<\%payload> should be a hashref suitable to apple document: L<http://developer.apple.com/iPhone/library/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/ApplePushService/ApplePushService.html>
 
@@ -297,7 +300,7 @@ More correct error handling
 
 =item *
 
-Auto recconection
+Auto reconnection
 
 =back
 
