@@ -1,5 +1,6 @@
 BEGIN { $ENV{PERL_DL_NONLAZY} = 0; } # XXX
 
+use utf8;
 use Test::Base;
 use Test::TCP;
 
@@ -11,8 +12,8 @@ use AnyEvent::Socket;
 my $port = empty_port;
 
 my $payloads = [
-    { alert => 'x'x500, },
-    { alert => { body => 'x'x500, } },
+    { alert => 'こんにちは'x100, },
+    { alert => { body => 'こんにちは'x100, } },
 ];
 
 for my $payload (@$payloads) {
@@ -65,7 +66,7 @@ for my $payload (@$payloads) {
 
         $handle->push_read( chunk => 2, sub {
             my $payload_length = unpack('n', $_[1]);
-            is($payload_length, 256, 'truncate $payload->{alert} ok');
+            like($payload_length, qr/^25[0-6]$/, 'truncate $payload->{alert} ok');
 
             $handle->push_read( chunk => $payload_length, sub {
                 is(length $_[1], $payload_length, 'payload length ok');
