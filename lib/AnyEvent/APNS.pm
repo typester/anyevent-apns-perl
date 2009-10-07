@@ -11,7 +11,7 @@ require bytes;
 use Encode;
 use JSON::Any;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 has certificate => (
     is       => 'rw',

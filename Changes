@@ -1,5 +1,11 @@
 Revision history for Perl extension AnyEvent::APNS
 
+0.05  2009-10-07T12:54:58+09:00
+      - now send method trimmed payload body if its length over 256bytes;
+        because payload exceed the size will be ignored by Apple APNs server.
+      - refactor handler managing
+      - fix some typos
+
 0.04  2009-09-09T12:00:10+09:00
       - fixed a bug around error_handler
 
