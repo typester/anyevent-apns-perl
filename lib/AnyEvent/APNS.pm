@@ -84,8 +84,42 @@ sub send {
     $h->push_write( pack('n', bytes::length($token)) ); # token length
     $h->push_write( $token );                           # device token
 
+    # The maximum size allowed for a notification payload is 256 bytes;
+    # Apple Push Notification Service refuses any notification that exceeds this limit.
+    if ( (my $exceeded = bytes::length($json) - 256) > 0 ) {
+        if (ref $payload->{alert} eq 'HASH') {
+            $payload->{alert}{body} =
+                $self->_trim_utf8($payload->{alert}{body}, $exceeded);
+        }
+        else {
+            $payload->{alert} = $self->_trim_utf8($payload->{alert}, $exceeded);
+        }
+
+        $json = encode_utf8( $self->json_driver->encode($payload) );
+    }
+
     $h->push_write( pack('n', bytes::length($json)) ); # payload length
     $h->push_write( $json );                           # payload
+}
+
+sub _trim_utf8 {
+    my ($self, $string, $trim_length) = @_;
+
+    my $string_bytes = encode_utf8($string);
+    my $trimmed = '';
+
+    my $start_length = bytes::length($string_bytes) - $trim_length;
+    return $trimmed if $start_length <= 0;
+
+    for my $len ( reverse $start_length - 6 .. $start_length ) {
+        local $@;
+        eval {
+            $trimmed = decode_utf8(substr($string_bytes, 0, $len), Encode::FB_CROAK);
+        };
+        last if $trimmed;
+    }
+
+    return $trimmed;
 }
 
 sub connect {
