@@ -12,8 +12,8 @@ use AnyEvent::Socket;
 my $port = empty_port;
 
 my $payloads = [
-    { alert => 'こんにちは'x100, },
-    { alert => { body => 'こんにちは'x100, } },
+    { aps => { alert => 'こんにちは'x100, } },
+    { aps => { alert => { body => 'こんにちは'x100, } } },
 ];
 
 for my $payload (@$payloads) {
