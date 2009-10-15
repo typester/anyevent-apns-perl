@@ -9,6 +9,7 @@ use AnyEvent::TLS;
 
 require bytes;
 use Encode;
+use Scalar::Util 'looks_like_number';
 use JSON::Any;
 
 our $VERSION = '0.05';
@@ -83,6 +84,11 @@ sub send {
 
     $h->push_write( pack('n', bytes::length($token)) ); # token length
     $h->push_write( $token );                           # device token
+
+    # Apple Push Notification Service refuses string values as badge number
+    if ($payload->{aps}{badge} && looks_like_number($payload->{aps}{badge})) {
+        $payload->{aps}{badge} += 0;
+    }
 
     # The maximum size allowed for a notification payload is 256 bytes;
     # Apple Push Notification Service refuses any notification that exceeds this limit.
