@@ -12,7 +12,7 @@ use Encode;
 use Scalar::Util 'looks_like_number';
 use JSON::Any;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has certificate => (
     is       => 'rw',
