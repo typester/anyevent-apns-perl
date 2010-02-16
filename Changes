@@ -1,5 +1,8 @@
 Revision history for Perl extension AnyEvent::APNS
 
+0.07  2010-02-16T14:08:32+09:00
+      - fix reconnect issue: ->connect warn 'already connected' but sometimes actially already be disconnected
+
 0.06  2009-10-15T17:19:13+09:00
       - cast badge number to int value explicitly
       - fix a bug trimming wring target... s/$payload->{alert}/$payload->{aps}{alert}/.

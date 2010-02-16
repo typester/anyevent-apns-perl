@@ -12,7 +12,7 @@ use Encode;
 use Scalar::Util 'looks_like_number';
 use JSON::Any;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 has certificate => (
     is       => 'rw',
@@ -131,7 +131,7 @@ sub _trim_utf8 {
 sub connect {
     my $self = shift;
 
-    if ($self->connected) {
+    if ($self->connected && $self->handler) {
         warn 'Already connected!';
         return;
     }
