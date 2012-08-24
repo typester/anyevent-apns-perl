@@ -9,6 +9,7 @@ requires 'JSON::Any';
 
 test_requires 'Test::More';
 test_requires 'Test::TCP';
+test_requires 'Test::Exception';
 
 use_test_base;
 author_tests('xt');

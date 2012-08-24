@@ -8,6 +8,7 @@ use AnyEvent::Socket;
 use AnyEvent::TLS;
 
 require bytes;
+use Carp qw(croak);
 use Encode;
 use Scalar::Util 'looks_like_number';
 use JSON::Any;
@@ -17,13 +18,21 @@ our $VERSION = '0.07';
 has certificate => (
     is       => 'rw',
     isa      => 'Str',
-    required => 1,
+);
+
+has certificate_raw => (
+    is       => 'rw',
+    isa      => 'Str',
 );
 
 has private_key => (
     is       => 'rw',
     isa      => 'Str',
-    required => 1,
+);
+
+has private_key_raw => (
+    is       => 'rw',
+    isa      => 'Str',
 );
 
 has sandbox => (
@@ -72,6 +81,17 @@ has _con_guard => (
 );
 
 no Any::Moose;
+
+sub BUILD {
+    my $self = shift;
+
+    if (!$self->certificate && !$self->certificate_raw) {
+        croak("required certificate or certificate_raw");
+    }
+    if (!$self->private_key && !$self->private_key_raw) {
+        croak("required private_key or private_key_raw");
+    }
+}
 
 sub send {
     my $self = shift;
@@ -145,10 +165,22 @@ sub connect {
         $host = '127.0.0.1';
         $port = $self->debug_port;
     }
-
     my $g = tcp_connect $host, $port, sub {
         my ($fh) = @_
             or return $self->on_error->(undef, 1, $!);
+
+        my $tls_setting = {};
+        $tls_setting->{cert_file} = $self->certificate
+            if $self->certificate;
+
+        $tls_setting->{cert}      = $self->certificate_raw
+            if $self->certificate_raw;
+
+        $tls_setting->{key_file}  = $self->private_key
+            if $self->private_key;
+
+        $tls_setting->{key}       = $self->private_key_raw
+            if  $self->private_key_raw;
 
         my $handle = AnyEvent::Handle->new(
             fh       => $fh,
@@ -159,10 +191,7 @@ sub connect {
             },
             !$self->is_debug ? (
                 tls      => 'connect',
-                tls_ctx  => {
-                    cert_file => $self->certificate,
-                    key_file  => $self->private_key,
-                },
+                tls_ctx  => $tls_setting,
             ) : (),
         );
         $self->handler( $handle );
@@ -245,11 +274,19 @@ Supported arguments are:
 
 =item certificate => 'your apns certificate file'
 
-Required
+only one of certificate or certificate_raw can be specified
+
+=item certificate_raw => 'your apns certificate string'
+
+only one of certificate or certificate_raw can be specified
 
 =item private_key => 'your apns private key file',
 
-Required
+only one of private_key or private_key_raw can be specified
+
+=item private_key_raw => 'your apns private key string',
+
+only one of private_key or private_key_raw can be specified and be required
 
 =item sandbox => 0|1
 

@@ -6,24 +6,47 @@ plan 'no_plan';
 use Path::Class qw/file/;
 use AnyEvent::APNS;
 
+
 my $cer = "$ENV{HOME}/dev/apns/test.cer";
 my $key = "$ENV{HOME}/dev/apns/test.key";
 
 my $token = file("$ENV{HOME}/dev/apns/token.bin")->slurp;
+{
+    my $cv = AnyEvent->condvar;
 
-my $cv = AnyEvent->condvar;
+    my $apns; $apns = AnyEvent::APNS->new(
+        certificate => $cer,
+        private_key => $key,
+        sandbox     => 1,
+        on_connect  => sub {
+            $apns->send($token => { aps => { alert => "テスト！" }});
+            $apns->handler->on_drain(sub { undef $_[0]; $cv->send });
+        },
+    )->connect;
 
-my $apns; $apns = AnyEvent::APNS->new(
-    certificate => $cer,
-    private_key => $key,
-    sandbox     => 1,
-    on_connect  => sub {
-        $apns->send($token => { aps => { alert => "テスト！" }});
-        $apns->handler->on_drain(sub { undef $_[0]; $cv->send });
-    },
-)->connect;
+    $cv->recv;
 
-$cv->recv;
+    ok(1, "app runs ok, check your phone");
+}
 
-ok(1, "app runs ok, check your phone");
 
+{
+     my $cer_raw = file($cer)->slurp;
+     my $key_raw = file($key)->slurp;
+
+     my $cv = AnyEvent->condvar;
+
+     my $apns; $apns = AnyEvent::APNS->new(
+         certificate_raw => $cer_raw,
+         private_key_raw => $key_raw,
+         sandbox         => 1,
+         on_connect      => sub {
+             $apns->send($token => { aps => { alert => "もう一回テスト！" }});
+             $apns->handler->on_drain(sub { undef $_[0]; $cv->send });
+         },
+     )->connect;
+
+     $cv->recv;
+
+     ok(1, "app runs ok, check your phone again");
+}
