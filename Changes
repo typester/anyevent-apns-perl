@@ -1,5 +1,8 @@
 Revision history for Perl extension AnyEvent::APNS
 
+0.08  2012-08-27T18:27:56+09:00
+      - Added an option that accepts certificate and private_key datas directly instead of its file path. (shin1rosei)
+
 0.07  2010-02-16T14:08:32+09:00
       - fix reconnect issue: ->connect warn 'already connected' but sometimes actially already be disconnected
 
