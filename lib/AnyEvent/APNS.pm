@@ -8,6 +8,7 @@ use AnyEvent::Socket;
 use AnyEvent::TLS;
 
 require bytes;
+use Carp qw(croak);
 use Encode;
 use Scalar::Util 'looks_like_number';
 use JSON::Any;
@@ -16,13 +17,13 @@ our $VERSION = '0.07';
 
 has certificate => (
     is       => 'rw',
-    isa      => 'Str',
+    isa      => 'Str|ScalarRef',
     required => 1,
 );
 
 has private_key => (
     is       => 'rw',
-    isa      => 'Str',
+    isa      => 'Str|ScalarRef',
     required => 1,
 );
 
@@ -145,10 +146,24 @@ sub connect {
         $host = '127.0.0.1';
         $port = $self->debug_port;
     }
-
     my $g = tcp_connect $host, $port, sub {
         my ($fh) = @_
             or return $self->on_error->(undef, 1, $!);
+
+        my $tls_setting = {};
+        if (ref $self->certificate) {
+            $tls_setting->{cert}      = ${$self->certificate};
+        }
+        else {
+            $tls_setting->{cert_file} = $self->certificate;
+        }
+
+        if (ref $self->private_key) {
+            $tls_setting->{key}       = ${$self->private_key};
+        }
+        else {
+            $tls_setting->{key_file}  = $self->private_key;
+        }
 
         my $handle = AnyEvent::Handle->new(
             fh       => $fh,
@@ -159,10 +174,7 @@ sub connect {
             },
             !$self->is_debug ? (
                 tls      => 'connect',
-                tls_ctx  => {
-                    cert_file => $self->certificate,
-                    key_file  => $self->private_key,
-                },
+                tls_ctx  => $tls_setting,
             ) : (),
         );
         $self->handler( $handle );
@@ -245,11 +257,11 @@ Supported arguments are:
 
 =item certificate => 'your apns certificate file'
 
-Required
+Required. file path or content.
 
 =item private_key => 'your apns private key file',
 
-Required
+Required. file path or content.
 
 =item sandbox => 0|1
 
