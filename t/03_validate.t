@@ -21,23 +21,23 @@ lives_ok {
 lives_ok {
     my $apns; $apns = AnyEvent::APNS->new(
         debug_port  => $port,
-        certificate_raw => 'dummy',
-        private_key_raw => 'dummy',
+        certificate => \'dummy',
+        private_key => \'dummy',
     );
-} 'set certificate_raw and private_key_raw ok';
+} 'set certificate ref and private_key ref ok';
 
 throws_ok {
     my $apns; $apns = AnyEvent::APNS->new(
         debug_port  => $port,
         private_key => 'dummy',
     );
-} qr/required certificate or certificate_raw/
-, 'not set both certificate and certificate_raw';
+} qr/certificate.+is required/
+, 'not set certificate';
 
 throws_ok {
     my $apns; $apns = AnyEvent::APNS->new(
         debug_port  => $port,
         certificate => 'dummy',
     );
-} qr/required private_key or private_key_raw/
-, 'not set both private_key and private_key_raw';
+} qr/private_key.+is required/
+, 'not set private_key';

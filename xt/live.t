@@ -31,14 +31,14 @@ my $token = file("$ENV{HOME}/dev/apns/token.bin")->slurp;
 
 
 {
-     my $cer_raw = file($cer)->slurp;
-     my $key_raw = file($key)->slurp;
+     my $cer_content = file($cer)->slurp;
+     my $key_content = file($key)->slurp;
 
      my $cv = AnyEvent->condvar;
 
      my $apns; $apns = AnyEvent::APNS->new(
-         certificate_raw => $cer_raw,
-         private_key_raw => $key_raw,
+         certificate     => \$cer_content,
+         private_key     => \$key_content,
          sandbox         => 1,
          on_connect      => sub {
              $apns->send($token => { aps => { alert => "もう一回テスト！" }});

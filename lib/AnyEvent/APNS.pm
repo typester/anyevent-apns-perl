@@ -17,22 +17,14 @@ our $VERSION = '0.07';
 
 has certificate => (
     is       => 'rw',
-    isa      => 'Str',
-);
-
-has certificate_raw => (
-    is       => 'rw',
-    isa      => 'Str',
+    isa      => 'Str|ScalarRef',
+    required => 1,
 );
 
 has private_key => (
     is       => 'rw',
-    isa      => 'Str',
-);
-
-has private_key_raw => (
-    is       => 'rw',
-    isa      => 'Str',
+    isa      => 'Str|ScalarRef',
+    required => 1,
 );
 
 has sandbox => (
@@ -81,17 +73,6 @@ has _con_guard => (
 );
 
 no Any::Moose;
-
-sub BUILD {
-    my $self = shift;
-
-    if (!$self->certificate && !$self->certificate_raw) {
-        croak("required certificate or certificate_raw");
-    }
-    if (!$self->private_key && !$self->private_key_raw) {
-        croak("required private_key or private_key_raw");
-    }
-}
 
 sub send {
     my $self = shift;
@@ -170,17 +151,19 @@ sub connect {
             or return $self->on_error->(undef, 1, $!);
 
         my $tls_setting = {};
-        $tls_setting->{cert_file} = $self->certificate
-            if $self->certificate;
+        if (ref $self->certificate) {
+            $tls_setting->{cert}      = ${$self->certificate};
+        }
+        else {
+            $tls_setting->{cert_file} = $self->certificate;
+        }
 
-        $tls_setting->{cert}      = $self->certificate_raw
-            if $self->certificate_raw;
-
-        $tls_setting->{key_file}  = $self->private_key
-            if $self->private_key;
-
-        $tls_setting->{key}       = $self->private_key_raw
-            if  $self->private_key_raw;
+        if (ref $self->private_key) {
+            $tls_setting->{key}       = ${$self->private_key};
+        }
+        else {
+            $tls_setting->{key_file}  = $self->private_key;
+        }
 
         my $handle = AnyEvent::Handle->new(
             fh       => $fh,
@@ -274,19 +257,11 @@ Supported arguments are:
 
 =item certificate => 'your apns certificate file'
 
-only one of certificate or certificate_raw can be specified
-
-=item certificate_raw => 'your apns certificate string'
-
-only one of certificate or certificate_raw can be specified
+Required. file path or content.
 
 =item private_key => 'your apns private key file',
 
-only one of private_key or private_key_raw can be specified
-
-=item private_key_raw => 'your apns private key string',
-
-only one of private_key or private_key_raw can be specified and be required
+Required. file path or content.
 
 =item sandbox => 0|1
 
