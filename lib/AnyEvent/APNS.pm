@@ -17,13 +17,13 @@ our $VERSION = '0.07';
 
 has certificate => (
     is       => 'rw',
-    isa      => 'Str|ScalarRef',
+    isa      => 'Str | ScalarRef',
     required => 1,
 );
 
 has private_key => (
     is       => 'rw',
-    isa      => 'Str|ScalarRef',
+    isa      => 'Str | ScalarRef',
     required => 1,
 );
 
@@ -34,8 +34,8 @@ has sandbox => (
 );
 
 has handler => (
-    is      => 'rw',
-    isa     => 'AnyEvent::Handle',
+    is        => 'rw',
+    isa       => 'AnyEvent::Handle',
     predicate => 'connected',
     clearer   => 'clear_handler',
 );
@@ -152,14 +152,14 @@ sub connect {
 
         my $tls_setting = {};
         if (ref $self->certificate) {
-            $tls_setting->{cert}      = ${$self->certificate};
+            $tls_setting->{cert}      = ${ $self->certificate };
         }
         else {
             $tls_setting->{cert_file} = $self->certificate;
         }
 
         if (ref $self->private_key) {
-            $tls_setting->{key}       = ${$self->private_key};
+            $tls_setting->{key}       = ${ $self->private_key };
         }
         else {
             $tls_setting->{key_file}  = $self->private_key;
