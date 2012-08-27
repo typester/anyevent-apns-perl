@@ -10,3 +10,5 @@ Murase
 KAYAC
 AnyEvent
 reconnection
+ScalarRef
+Str

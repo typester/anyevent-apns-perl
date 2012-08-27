@@ -255,13 +255,21 @@ Supported arguments are:
 
 =over 4
 
-=item certificate => 'your apns certificate file'
+=item certificate => 'Str | ScalarRef'
 
-Required. file path or content.
+    certificate => '/path/to/certificate_file',
+    # or
+    certificate => \$certificate,
 
-=item private_key => 'your apns private key file',
+Required. Either file path for certificate or scalar-ref of certificate data.
 
-Required. file path or content.
+=item private_key => 'Str | ScalarRef'
+
+    private_key => '/path/to/private_key',
+    # or
+    private_key => \$private_key,
+
+Required. Either file path for private_key or scalar-ref of private-key data.
 
 =item sandbox => 0|1
 
