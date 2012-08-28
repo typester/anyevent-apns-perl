@@ -31,6 +31,7 @@ t/00_compile.t
 t/01_simple.t
 t/02_trim.t
 t/03_validate.t
+t/04_eof.t
 xt/live.t
 xt/pod.t
 xt/pod_coverage.t
