@@ -300,6 +300,12 @@ This is wrapper for L<AnyEvent::Handle>'s on_error callbacks. Look at the docume
 
 Optional (Default: just warn error)
 
+=item on_eof => $cb->($handle)
+
+Callback to be called when an end-of-file condition is detected.
+
+Optional. (Default: use on_error instead. read L<AnyEvent::Handle> for more detail)
+
 =item on_connect => $cb->()
 
 Callback to be called when connection established to apns server.
