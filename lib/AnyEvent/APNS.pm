@@ -55,6 +55,11 @@ has on_error => (
     default => sub { sub { warn @_ } },
 );
 
+has on_eof => (
+    is  => 'rw',
+    isa => 'CodeRef',
+);
+
 has on_connect => (
     is      => 'rw',
     isa     => 'CodeRef',
@@ -178,6 +183,17 @@ sub connect {
             ) : (),
         );
         $self->handler( $handle );
+
+        if ($self->on_eof) {
+            $handle->on_eof(sub {
+                $self->on_eof->(@_);
+                $self->clear_handler;
+                $_[0]->destroy;
+            });
+        }
+
+        # ignore read
+        $handle->on_read(sub { delete $_[0]->{rbuf} });
 
         $self->on_connect->();
     };
