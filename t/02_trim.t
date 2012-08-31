@@ -3,8 +3,9 @@ BEGIN { $ENV{PERL_DL_NONLAZY} = 0; } # XXX
 use utf8;
 use Test::Base;
 use Test::TCP;
+use Test::Time; # to fix expiry
 
-plan tests => 12;
+plan tests => 16;
 
 use AnyEvent::APNS;
 use AnyEvent::Socket;
@@ -53,7 +54,16 @@ for my $payload (@$payloads) {
         );
 
         $handle->push_read( chunk => 1, sub {
-            is($_[1], pack('C', 0), 'command ok');
+            is($_[1], pack('C', 1), 'command ok');
+        });
+
+        $handle->push_read( chunk => 4, sub {
+            is($_[1], pack('N', 1), 'identifier ok');
+        });
+
+        $handle->push_read( chunk => 4, sub {
+            my $expiry = unpack('N', $_[1]);
+            is( $expiry, time() + 3600 * 24, 'expiry ok');
         });
 
         $handle->push_read( chunk => 2, sub {

@@ -10,6 +10,7 @@ requires 'JSON::Any';
 test_requires 'Test::More';
 test_requires 'Test::TCP';
 test_requires 'Test::Exception';
+test_requires 'Test::Time';
 
 use_test_base;
 author_tests('xt');
