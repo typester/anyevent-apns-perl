@@ -102,7 +102,7 @@ sub send {
     $expiry  = defined $expiry ? $expiry : time() + 3600 * 24;
 
     # Identifier—An arbitrary value that identifies this notification. This same identifier is returned in a error-response packet if APNs cannot interpret a notification.
-    my $next_identifier = $self->increment_identifier;
+    my $next_identifier = $self->_increment_identifier;
 
     my $h = $self->handler;
 
@@ -218,7 +218,7 @@ sub connect {
         if ( $self->on_error_response ) {
             $handle->on_read(
                 sub {
-                    $self->on_read_with_error_callback( @_ );
+                    $self->_on_read_with_error_callback( @_ );
                 }
             );
         }
@@ -235,7 +235,7 @@ sub connect {
     $self;
 }
 
-sub on_read_with_error_callback {
+sub _on_read_with_error_callback {
     my ($self, $handle) = @_;
     $handle->push_read( chunk => 1,
                         sub {
@@ -256,7 +256,7 @@ sub on_read_with_error_callback {
 }
 
 # 0 ... 2**32-1, 0 ... 2**32-1, 0 ...
-sub increment_identifier {
+sub _increment_identifier {
     my ($self) = @_;
     my $next_identifier = $self->last_identifier + 1;
     if ( $next_identifier >= 2 ** 32 ) {
