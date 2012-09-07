@@ -289,11 +289,15 @@ AnyEvent::APNS - Simple wrapper for Apple Push Notifications Service (APNS) prov
         sandbox     => 1,
         on_error    => sub { # something went wrong },
         on_connect  => sub {
-            $apns->send( $device_token => {
+            my $identifier = $apns->send( $device_token => {
                 aps => {
                     alert => 'Message received from Bob',
                 },
             });
+        },
+        on_error_response => sub {
+            my ($identifier, $status) = @_;
+            # something wrong
         },
     );
     $apns->connect;
@@ -374,6 +378,16 @@ Callback to be called when connection established to apns server.
 
 Optional (Default: empty coderef)
 
+=item on_error_response => $cb->($identifier, $status)
+
+Callback to be called when APNs detects notification malformed or otherwise unintelligible.
+
+C<$status> codes are documented here: L<http://developer.apple.com/library/ios/#DOCUMENTATION/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingWIthAPS/CommunicatingWIthAPS.html>
+
+C<$identifier> is the return value of C<send>.
+
+Optional (Default: ignore)
+
 =back
 
 =head2 $apns->connect;
@@ -384,7 +398,7 @@ Connect to apns server.
 
 Send apns messages with C<\%payload> to device specified C<$device_token>.
 
-    $apns->send( $device_token => {
+    my $identifier = $apns->send( $device_token => {
         aps => {
             alert => 'Message received from Bob',
         },
@@ -395,6 +409,8 @@ C<$device_token> should be a binary 32bytes device token provided by iPhone SDK 
 C<\%payload> should be a hashref suitable to apple document: L<http://developer.apple.com/iPhone/library/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/ApplePushService/ApplePushService.html>
 
 Note: If you involve multi-byte strings in C<\%payload>, it should be utf8 decoded strings not utf8 bytes.
+
+Store C<$identifier> with your C<$device_token> to react to C<on_error_response>.
 
 =head2 $apns->handler
 
