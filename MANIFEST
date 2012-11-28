@@ -19,6 +19,7 @@ inc/Test/Builder/Module.pm
 inc/Test/Exception.pm
 inc/Test/More.pm
 inc/Test/TCP.pm
+inc/Test/Time.pm
 lib/AnyEvent/APNS.pm
 LICENSE
 Makefile.PL
