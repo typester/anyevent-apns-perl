@@ -109,8 +109,7 @@ sub send {
     $h->push_write( pack('C', 1) ); # command
     $h->push_write( pack('N', $next_identifier) );
     $h->push_write( pack('N', $expiry) );
-    $h->push_write( pack('n', bytes::length($token)) ); # token length
-    $h->push_write( $token );                           # device token
+    $h->push_write( pack('n/a*', pack("H*",$token) ) ); # token length
 
     # Apple Push Notification Service refuses string values as badge number
     if ($payload->{aps}{badge} && looks_like_number($payload->{aps}{badge})) {
