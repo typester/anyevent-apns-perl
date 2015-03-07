@@ -11,9 +11,9 @@ require bytes;
 use Carp qw(croak);
 use Encode;
 use Scalar::Util 'looks_like_number';
-use JSON::Any;
+use JSON;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 has certificate => (
     is       => 'rw',
@@ -45,7 +45,7 @@ has json_driver => (
     isa     => 'Object',
     lazy    => 1,
     default => sub {
-        JSON::Any->new( utf8 => 1 );
+        JSON->new->utf8;
     },
 );
 
@@ -94,7 +94,7 @@ sub send {
     my $self = shift;
     my ($token, $payload, $expiry) = @_;
 
-    my $json = encode_utf8( $self->json_driver->encode($payload) );
+    my $json = $self->json_driver->encode($payload);
 
     # http://developer.apple.com/library/ios/#DOCUMENTATION/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingWIthAPS/CommunicatingWIthAPS.html
     # Expiry—A fixed UNIX epoch date expressed in seconds (UTC) that identifies when the notification is no longer valid and can be discarded. The expiry value should be in network order (big endian). If the expiry value is positive, APNs tries to deliver the notification at least once. You can specify zero or a value less than zero to request that APNs not store the notification at all.
@@ -128,7 +128,7 @@ sub send {
             $payload->{aps}{alert} = $self->_trim_utf8($payload->{aps}{alert}, $exceeded);
         }
 
-        $json = encode_utf8( $self->json_driver->encode($payload) );
+        $json = $self->json_driver->encode($payload);
     }
 
     $h->push_write( pack('n', bytes::length($json)) ); # payload length

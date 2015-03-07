@@ -1,5 +1,8 @@
 Revision history for Perl extension AnyEvent::APNS
 
+0.11  2015-03-07T12:26:00-05:00
+      - Converted to JSON from JSON::Any
+
 0.10  2012-11-28T09:22:31+09:00
       - use enhanced notification format (mash)
       - added last_identifier, on_error_response property (mash)
