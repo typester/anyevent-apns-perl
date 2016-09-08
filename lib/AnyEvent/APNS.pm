@@ -117,9 +117,9 @@ sub send {
         $payload->{aps}{badge} += 0;
     }
 
-    # The maximum size allowed for a notification payload is 256 bytes;
+    # The maximum size allowed for a notification payload is 2048 bytes;
     # Apple Push Notification Service refuses any notification that exceeds this limit.
-    if ( (my $exceeded = bytes::length($json) - 256) > 0 ) {
+    if ( (my $exceeded = bytes::length($json) - 2048) > 0 ) {
         if (ref $payload->{aps}{alert} eq 'HASH') {
             $payload->{aps}{alert}{body} =
                 $self->_trim_utf8($payload->{aps}{alert}{body}, $exceeded);

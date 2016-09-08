@@ -13,8 +13,8 @@ use AnyEvent::Socket;
 my $port = empty_port;
 
 my $payloads = [
-    { aps => { alert => 'こんにちは'x100, } },
-    { aps => { alert => { body => 'こんにちは'x100, } } },
+    { aps => { alert => 'こんにちは'x200, } },
+    { aps => { alert => { body => 'こんにちは'x200, } } },
 ];
 
 for my $payload (@$payloads) {
@@ -76,7 +76,7 @@ for my $payload (@$payloads) {
 
         $handle->push_read( chunk => 2, sub {
             my $payload_length = unpack('n', $_[1]);
-            like($payload_length, qr/^25[0-6]$/, 'truncate $payload->{alert} ok');
+            like($payload_length, qr/^204[0-8]$/, 'truncate $payload->{alert} ok');
 
             $handle->push_read( chunk => $payload_length, sub {
                 is(length $_[1], $payload_length, 'payload length ok');
